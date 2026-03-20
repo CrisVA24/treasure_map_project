@@ -61,7 +61,7 @@ class StartScreen:
 
     def start(self):
         if self.size_var.get():
-            self.app.switch_screen(MapEditorScreen)
+            self.app.switch_screen(MapEditorScreen, size=self.size_var.get())
         else:
             self.error_message_var.set("Please select a map size to continue")
 

@@ -12,10 +12,10 @@ class App:
     def run(self):
         self.root.mainloop()
     
-    def switch_screen(self, screen_class):
+    def switch_screen(self, screen_class, **kwargs):
         if self.current_screen:
             self.current_screen.destroy()
 
-        self.current_screen = screen_class(self.root, self)
+        self.current_screen = screen_class(self.root, self, **kwargs)
     
 
