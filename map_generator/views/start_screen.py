@@ -13,7 +13,8 @@ class StartScreen:
 
 
         #VARIABLES
-        self.size_var = StringVar(value='None')
+        self.size_var = StringVar(value="")
+        self.error_message_var = StringVar(value="")
 
         #TITLE
         self.title_label = Label(self.frame, text='Treasure Trace', fg='black', font=('Helvetica', 20, 'bold'))
@@ -52,8 +53,17 @@ class StartScreen:
         self.start_button = Button(self.frame, command=self.start, width=20, text='Start Adventure', font=('Helvetica', 18, 'bold'), bg='#ffffff',fg='black')
         self.start_button.pack(pady=(0, 10))
 
+        #ERROR MESSAGE
+        self.error_label = Label(self.frame, textvariable=self.error_message_var, fg="red")
+        self.error_label.pack(pady=(0, 10))
+
+    
+
     def start(self):
-        self.app.switch_screen(MapEditorScreen)
+        if self.size_var.get():
+            self.app.switch_screen(MapEditorScreen)
+        else:
+            self.error_message_var.set("Please select a map size to continue")
 
     def destroy(self):
         self.frame.destroy()
