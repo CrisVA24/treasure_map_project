@@ -1,19 +1,26 @@
 from tkinter import *
+from views.map_editor_screen import MapEditorScreen
 
 class StartScreen:
 
-    def __init__(self, root):
+    def __init__(self, root, app):
         self.root = root
+        self.app = app
+
+        #Frame
+        self.frame = Frame(self.root)
+        self.frame.pack()
+
 
         #VARIABLES
         self.size_var = StringVar(value='None')
 
         #TITLE
-        self.title = Label(root, text='Treasure Trace', fg='black', font=('Helvetica', 20, 'bold'))
-        self.title.pack(pady=10)
+        self.title_label = Label(self.frame, text='Treasure Trace', fg='black', font=('Helvetica', 20, 'bold'))
+        self.title_label.pack(pady=10)
 
         #MAIN CONTAINER
-        self.main_container = Frame(root)
+        self.main_container = Frame(self.frame)
         self.main_container.pack(pady=(0, 10))
 
         #INSTRUCTIONS
@@ -42,5 +49,11 @@ class StartScreen:
             button.pack(pady=10)        
 
         #START BUTTON
-        self.start_button = Button(root, width=20, text='Start Adventure', font=('Helvetica', 18, 'bold'), bg='#ffffff',fg='black')
+        self.start_button = Button(self.frame, command=self.start, width=20, text='Start Adventure', font=('Helvetica', 18, 'bold'), bg='#ffffff',fg='black')
         self.start_button.pack(pady=(0, 10))
+
+    def start(self):
+        self.app.switch_screen(MapEditorScreen)
+
+    def destroy(self):
+        self.frame.destroy()

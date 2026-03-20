@@ -1,5 +1,6 @@
 from tkinter import Tk
 from views.start_screen import StartScreen
+from views.map_editor_screen import MapEditorScreen
 
 class App:
 
@@ -10,11 +11,11 @@ class App:
 
     def run(self):
         self.root.mainloop()
-    '''
-    def switch_screen(self, new_screen_class):
+    
+    def switch_screen(self, screen_class):
         if self.current_screen:
             self.current_screen.destroy()
 
-        self.current_screen = new_screen_class(self.root, self)
-    '''
+        self.current_screen = screen_class(self.root, self)
+    
 
