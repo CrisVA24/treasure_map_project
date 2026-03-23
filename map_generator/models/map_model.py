@@ -46,38 +46,36 @@ class MapModel:
         if not self.start:
             return []
 
-        start = self.start
         visited = set()
 
-        best_path = []
-        best_length = float('inf')
-
         def backtrack(x, y, path):
-            nonlocal best_path, best_length
-
+            # Fuera de límites
             if not (0 <= x < self.size and 0 <= y < self.size):
-                return
+                return None
 
+            # Obstáculo o visitado
             if self.grid[x][y] == '#' or (x, y) in visited:
-                return
+                return None
 
             path.append((x, y))
             visited.add((x, y))
 
+            # Si es tesoro → TERMINAR
             if self.grid[x][y] == 'T':
-                if len(path) < best_length:
-                    best_path = path.copy()
-                    best_length = len(path)
-            else:
-                backtrack(x+1, y, path)
-                backtrack(x-1, y, path)
-                backtrack(x, y+1, path)
-                backtrack(x, y-1, path)
+                return path.copy()
 
+            # Explorar vecinos
+            for dx, dy in [(1,0), (-1,0), (0,1), (0,-1)]:
+                result = backtrack(x + dx, y + dy, path)
+                if result:
+                    return result
+
+            # Backtrack
             path.pop()
             visited.remove((x, y))
 
-        backtrack(start[0], start[1], [])
+            return None
 
-        return best_path
+        result = backtrack(self.start[0], self.start[1], [])
+        return result if result else []
         

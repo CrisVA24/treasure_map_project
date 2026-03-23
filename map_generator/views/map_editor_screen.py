@@ -98,7 +98,7 @@ class MapEditorScreen:
             text="Back",
             command=self.go_back,
             width=20
-        ).pack(pady=5)
+        ).pack(pady=(5, 10))
 
     # -------------------------
     # GRID
@@ -209,3 +209,18 @@ class MapEditorScreen:
                 self.buttons[x][y].config(text='*')
 
         self.message_var.set("Path found!")
+
+    def clear_map(self):
+        # Reiniciar modelo
+        self.model = MapModel(self.size_map)
+        self.controller = MapController(self.model)
+
+        # Limpiar UI
+        for i in range(self.size_map):
+            for j in range(self.size_map):
+                self.buttons[i][j].config(text='')
+
+        # Resetear estado
+        self.selected_tool.set("obstacle")
+        self.start_radio.config(state=NORMAL)
+        self.message_var.set("")
