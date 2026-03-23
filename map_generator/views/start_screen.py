@@ -1,5 +1,4 @@
 from tkinter import *
-from views.map_editor_screen import MapEditorScreen
 
 class StartScreen:
 
@@ -60,6 +59,7 @@ class StartScreen:
     
 
     def start(self):
+        from views.map_editor_screen import MapEditorScreen
         if self.size_var.get():
             self.app.switch_screen(MapEditorScreen, size=self.size_var.get())
         else:
