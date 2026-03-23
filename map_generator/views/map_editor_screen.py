@@ -192,23 +192,37 @@ class MapEditorScreen:
         self.frame.destroy()
 
     def solve_map_ui(self):
+        # 1. VALIDAR Y GUARDAR MAPA
+        valid, message = self.controller.validate_map()
+
+        if not valid:
+            self.message_var.set(message)
+            return
+
+        try:
+            with open("map.txt", "w") as file:
+                file.write(self.controller.get_map_string())
+        except:
+            self.message_var.set("Error saving the map.")
+            return
+
+        # 2. RESOLVER MAPA
         success, result = self.controller.solve_map()
 
         if not success:
             self.message_var.set(result)
 
-            # Crear archivo de error (requisito)
             with open("mapa_err.txt", "w") as f:
                 f.write(f"error, mapa sin solución iniciando en la coordenada {self.model.start}")
 
             return
 
-        # Dibujar camino
+        # 3. DIBUJAR CAMINO
         for (x, y) in result:
             if self.model.grid[x][y] == '.':
                 self.buttons[x][y].config(text='*')
 
-        self.message_var.set("Path found!")
+        self.message_var.set("Map saved and path found!")
 
     def clear_map(self):
         # Reiniciar modelo
