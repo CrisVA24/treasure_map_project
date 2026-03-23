@@ -9,30 +9,26 @@ class MapEditorScreen:
         self.root = root
         self.app = app
 
-        # CONTENEDOR PRINCIPAL
+        #MAIN CONTAINER
         self.frame = Frame(self.root)
         self.frame.pack()
 
-        # MODELO Y CONTROLLER
+        #MODEL AND CONTROLLER
         self.size_map = self.get_dimensions(size)
         self.model = MapModel(self.size_map)
         self.controller = MapController(self.model)
 
-        # VARIABLES
+        #VARIABLES
         self.selected_tool = StringVar(value="obstacle")
 
-        # -------------------------
-        # TITLE
-        # -------------------------
+        #TITLE
         Label(
             self.frame,
             text="Treasure Trace",
             font=('Helvetica', 20, 'bold')
         ).pack(pady=10)
 
-        # -------------------------
-        # TOOLBAR
-        # -------------------------
+        #TOOLBAR
         toolbar = Frame(self.frame)
         toolbar.pack(pady=5)
 
@@ -61,24 +57,18 @@ class MapEditorScreen:
             width=12
         ).grid(row=0, column=2, padx=5)
 
-        # -------------------------
-        # GRID
-        # -------------------------
+        #GRID
         self.grid_frame = Frame(self.frame)
         self.grid_frame.pack(pady=10)
 
         self.buttons = []
         self.create_grid()
 
-        # -------------------------
-        # MENSAJES
-        # -------------------------
+        #MESSAGES
         self.message_var = StringVar(value="")
         Label(self.frame, textvariable=self.message_var, fg="red").pack()
 
-        # -------------------------
-        # BOTONES
-        # -------------------------
+        #BUTTONS
         Button(
             self.frame,
             text="Solve Map",
@@ -100,9 +90,7 @@ class MapEditorScreen:
             width=20
         ).pack(pady=(5, 10))
 
-    # -------------------------
-    # GRID
-    # -------------------------
+    #GRID
     def create_grid(self):
         for i in range(self.size_map):
             row = []
@@ -122,9 +110,7 @@ class MapEditorScreen:
 
             self.buttons.append(row)
 
-    # -------------------------
-    # EVENTO CLICK
-    # -------------------------
+    #CLIC EVENT
     def on_cell_click(self, x, y):
         tool = self.selected_tool.get()
 
@@ -139,18 +125,14 @@ class MapEditorScreen:
 
         self.update_cell_ui(x, y)
 
-    # -------------------------
-    # ACTUALIZAR UI
-    # -------------------------
+    #UPDATE UI
     def update_cell_ui(self, x, y):
         value = self.model.grid[x][y]
         btn = self.buttons[x][y]
 
         btn.config(text=value)
 
-    # -------------------------
-    # GUARDAR MAPA
-    # -------------------------
+    #SAVE MAPA
     def save_map(self):
         valid, message = self.controller.validate_map()
 
@@ -167,16 +149,12 @@ class MapEditorScreen:
         except:
             self.message_var.set("Error saving the map.")
 
-    # -------------------------
-    # VOLVER
-    # -------------------------
+    #GET BACK
     def go_back(self):
         from views.start_screen import StartScreen
         self.app.switch_screen(StartScreen)
 
-    # -------------------------
     # UTIL
-    # -------------------------
     def get_dimensions(self, size_label):
         sizes = {
             "Small": 10,
@@ -185,20 +163,19 @@ class MapEditorScreen:
         }
         return sizes[size_label]
 
-    # -------------------------
-    # DESTROY
-    # -------------------------
+    #DESTROY
     def destroy(self):
         self.frame.destroy()
 
     def solve_map_ui(self):
-        # 1. VALIDAR Y GUARDAR MAPA
+        # Validate the map before saving or solving
         valid, message = self.controller.validate_map()
 
         if not valid:
             self.message_var.set(message)
             return
 
+        # Save the map to a file
         try:
             with open("map.txt", "w") as file:
                 file.write(self.controller.get_map_string())
@@ -206,35 +183,37 @@ class MapEditorScreen:
             self.message_var.set("Error saving the map.")
             return
 
-        # 2. RESOLVER MAPA
+        # Solve the map using backtracking
         success, result = self.controller.solve_map()
 
         if not success:
             self.message_var.set(result)
 
+            # Create error file if no solution is found
             with open("mapa_err.txt", "w") as f:
-                f.write(f"error, mapa sin solución iniciando en la coordenada {self.model.start}")
+                f.write(f"Error: map has no solution starting from coordinate {self.model.start}")
 
             return
 
-        # 3. DIBUJAR CAMINO
+        # Draw the path on the UI
         for (x, y) in result:
             if self.model.grid[x][y] == '.':
                 self.buttons[x][y].config(text='*')
 
+        # Display success message
         self.message_var.set("Map saved and path found!")
 
     def clear_map(self):
-        # Reiniciar modelo
+        # Reset the model and controller
         self.model = MapModel(self.size_map)
         self.controller = MapController(self.model)
 
-        # Limpiar UI
+        # Clear the UI grid
         for i in range(self.size_map):
             for j in range(self.size_map):
                 self.buttons[i][j].config(text='')
 
-        # Resetear estado
+        # Reset UI state
         self.selected_tool.set("obstacle")
         self.start_radio.config(state=NORMAL)
         self.message_var.set("")

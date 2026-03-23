@@ -6,10 +6,9 @@ class StartScreen:
         self.root = root
         self.app = app
 
-        #Frame
+        #FRAME
         self.frame = Frame(self.root)
         self.frame.pack()
-
 
         #VARIABLES
         self.size_var = StringVar(value="")
@@ -55,8 +54,6 @@ class StartScreen:
         #ERROR MESSAGE
         self.error_label = Label(self.frame, textvariable=self.error_message_var, fg="red")
         self.error_label.pack(pady=(0, 10))
-
-    
 
     def start(self):
         from views.map_editor_screen import MapEditorScreen
