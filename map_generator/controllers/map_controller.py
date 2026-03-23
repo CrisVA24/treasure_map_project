@@ -31,3 +31,16 @@ class MapController:
 
     def get_map_string(self):
         return self.model.to_string()
+    
+    def solve_map(self):
+        valid, message = self.validate_map()
+
+        if not valid:
+            return False, message
+
+        path = self.model.solve()
+
+        if not path:
+            return False, "No path found."
+
+        return True, path

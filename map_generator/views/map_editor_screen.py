@@ -9,11 +9,11 @@ class MapEditorScreen:
         self.root = root
         self.app = app
 
-        # CONTENEDOR
+        # CONTENEDOR PRINCIPAL
         self.frame = Frame(self.root)
         self.frame.pack()
 
-        # MODELO + CONTROLLER
+        # MODELO Y CONTROLLER
         self.size_map = self.get_dimensions(size)
         self.model = MapModel(self.size_map)
         self.controller = MapController(self.model)
@@ -21,75 +21,117 @@ class MapEditorScreen:
         # VARIABLES
         self.selected_tool = StringVar(value="obstacle")
 
+        # -------------------------
         # TITLE
-        Label(self.frame, text="Treasure Trace",
-              font=('Helvetica', 20, 'bold')).pack(pady=10)
+        # -------------------------
+        Label(
+            self.frame,
+            text="Treasure Trace",
+            font=('Helvetica', 20, 'bold')
+        ).pack(pady=10)
 
+        # -------------------------
         # TOOLBAR
+        # -------------------------
         toolbar = Frame(self.frame)
         toolbar.pack(pady=5)
 
         self.start_radio = Radiobutton(
-            toolbar, text="Start", variable=self.selected_tool,
-            value="start", indicatoron=0, width=10
+            toolbar, text="Start (S)",
+            variable=self.selected_tool,
+            value="start",
+            indicatoron=0,
+            width=12
         )
-        self.start_radio.grid(row=0, column=0)
+        self.start_radio.grid(row=0, column=0, padx=5)
 
-        Radiobutton(toolbar, text="Obstacle", variable=self.selected_tool,
-                    value="obstacle", indicatoron=0, width=10).grid(row=0, column=1)
+        Radiobutton(
+            toolbar, text="Obstacle (#)",
+            variable=self.selected_tool,
+            value="obstacle",
+            indicatoron=0,
+            width=12
+        ).grid(row=0, column=1, padx=5)
 
-        Radiobutton(toolbar, text="Treasure", variable=self.selected_tool,
-                    value="treasure", indicatoron=0, width=10).grid(row=0, column=2)
+        Radiobutton(
+            toolbar, text="Treasure (T)",
+            variable=self.selected_tool,
+            value="treasure",
+            indicatoron=0,
+            width=12
+        ).grid(row=0, column=2, padx=5)
 
+        # -------------------------
         # GRID
+        # -------------------------
         self.grid_frame = Frame(self.frame)
         self.grid_frame.pack(pady=10)
 
         self.buttons = []
         self.create_grid()
 
-        # ERROR LABEL
-        self.error_message_var = StringVar(value="")
-        Label(self.frame, textvariable=self.error_message_var, fg="red").pack()
+        # -------------------------
+        # MENSAJES
+        # -------------------------
+        self.message_var = StringVar(value="")
+        Label(self.frame, textvariable=self.message_var, fg="red").pack()
 
-        # SAVE BUTTON
-        Button(self.frame, text="Save Map",
-               command=self.save_map).pack(pady=5)
+        # -------------------------
+        # BOTONES
+        # -------------------------
+        Button(
+            self.frame,
+            text="Solve Map",
+            command=self.solve_map_ui,
+            width=20
+        ).pack(pady=5)
 
-        # BACK BUTTON
-        Button(self.frame, text="Back",
-               command=self.go_back).pack(pady=5)
+        Button(
+            self.frame,
+            text="Clear Map",
+            command=self.clear_map,
+            width=20
+        ).pack(pady=5)
+
+        Button(
+            self.frame,
+            text="Back",
+            command=self.go_back,
+            width=20
+        ).pack(pady=5)
 
     # -------------------------
     # GRID
     # -------------------------
-
     def create_grid(self):
         for i in range(self.size_map):
             row = []
             for j in range(self.size_map):
+
                 btn = Button(
                     self.grid_frame,
+                    text="",
                     width=2,
                     height=1,
-                    bg="white",
+                    font=('Consolas', 10),
                     command=lambda x=i, y=j: self.on_cell_click(x, y)
                 )
                 btn.grid(row=i, column=j)
+
                 row.append(btn)
+
             self.buttons.append(row)
 
     # -------------------------
     # EVENTO CLICK
     # -------------------------
-
     def on_cell_click(self, x, y):
         tool = self.selected_tool.get()
 
         success, message = self.controller.handle_cell_click(x, y, tool)
 
         if not success:
-            self.error_message_var.set(message)
+            self.message_var.set(message)
             return
 
         if message == "start_placed":
@@ -98,46 +140,36 @@ class MapEditorScreen:
         self.update_cell_ui(x, y)
 
     # -------------------------
-    # UI UPDATE
+    # ACTUALIZAR UI
     # -------------------------
-
     def update_cell_ui(self, x, y):
         value = self.model.grid[x][y]
         btn = self.buttons[x][y]
 
-        colors = {
-            '#': "gray",
-            'T': "gold",
-            'S': "green",
-            '.': "white"
-        }
-
-        btn.config(bg=colors.get(value, "white"))
+        btn.config(text=value)
 
     # -------------------------
-    # SAVE
+    # GUARDAR MAPA
     # -------------------------
-
     def save_map(self):
         valid, message = self.controller.validate_map()
 
         if not valid:
-            self.error_message_var.set(message)
+            self.message_var.set(message)
             return
 
         try:
             with open("map.txt", "w") as file:
                 file.write(self.controller.get_map_string())
 
-            self.error_message_var.set("Map saved successfully!")
+            self.message_var.set("Map saved successfully!")
 
         except:
-            self.error_message_var.set("Error saving the map.")
+            self.message_var.set("Error saving the map.")
 
     # -------------------------
-    # NAVIGATION
+    # VOLVER
     # -------------------------
-
     def go_back(self):
         from views.start_screen import StartScreen
         self.app.switch_screen(StartScreen)
@@ -145,14 +177,35 @@ class MapEditorScreen:
     # -------------------------
     # UTIL
     # -------------------------
-
     def get_dimensions(self, size_label):
-        sizes = {"Small": 15, "Medium": 20, "Large": 25}
+        sizes = {
+            "Small": 10,
+            "Medium": 15,
+            "Large": 20
+        }
         return sizes[size_label]
 
     # -------------------------
     # DESTROY
     # -------------------------
-
     def destroy(self):
         self.frame.destroy()
+
+    def solve_map_ui(self):
+        success, result = self.controller.solve_map()
+
+        if not success:
+            self.message_var.set(result)
+
+            # Crear archivo de error (requisito)
+            with open("mapa_err.txt", "w") as f:
+                f.write(f"error, mapa sin solución iniciando en la coordenada {self.model.start}")
+
+            return
+
+        # Dibujar camino
+        for (x, y) in result:
+            if self.model.grid[x][y] == '.':
+                self.buttons[x][y].config(text='*')
+
+        self.message_var.set("Path found!")
